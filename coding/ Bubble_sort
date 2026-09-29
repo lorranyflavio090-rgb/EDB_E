@@ -1,0 +1,96 @@
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <numeric>
+#include <algorithm>
+
+/**
+ * Ordena um subvetor utilizando o algoritmo Bubble Sort otimizado.
+ * 
+ * @param arr Vetor de inteiros a ser ordenado.
+ * @param esq Índice inicial do intervalo (inclusivo).
+ * @param dir Índice final do intervalo (exclusivo).
+ */
+void bubbleSort(std::vector<int>& arr, int esq, int dir) {
+    if (dir - esq <= 1) return;
+
+    int n = dir - esq;
+    // Laço externo controla o número de passagens
+    for (int i = 0; i < n - 1; ++i) {
+        bool trocou = false; // Flag para parada antecipada
+
+        // Laço interno compara elementos adjacentes
+        for (int j = esq; j < dir - 1 - i; ++j) {
+            if (arr[j] > arr[j + 1]) {
+                std::swap(arr[j], arr[j + 1]);
+                trocou = true;
+            }
+        }
+
+        // Se nenhuma troca ocorreu, o subvetor já está totalmente ordenado
+        if (!trocou) break;
+    }
+}
+
+int main() {
+    const int TRIALS = 5;
+    const int START_SIZE = 0;
+    const int END_SIZE = 20000;
+    const int STEP = 1000;
+
+    // --------------------------------------------------------------------------
+    // 1. MELHOR CASO (Vetor já ordenado, parada no 1º ciclo) -> O(N)
+    // --------------------------------------------------------------------------
+    std::cout << "MELHORES CASOS - BUBBLE SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = i;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            bubbleSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    std::cout << "\n";
+
+    // --------------------------------------------------------------------------
+    // 2. PIOR CASO (Vetor decrescente, número máximo de trocas) -> O(N^2)
+    // --------------------------------------------------------------------------
+    std::cout << "PIORES CASOS - BUBBLE SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = size - i;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            bubbleSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    return 0;
+}
