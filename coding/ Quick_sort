@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <numeric>
+#include <algorithm>
+
+/**
+ * Particiona o subvetor em torno de um pivô (último elemento: arr[dir - 1]).
+ * 
+ * @param arr Vetor original.
+ * @param esq Início do subvetor (inclusivo).
+ * @param dir Fim do subvetor (exclusivo).
+ * @return Índice final de posicionamento do pivô.
+ */
+int particiona(std::vector<int>& arr, int esq, int dir) {
+    int pivo = arr[dir - 1]; // Escolhe o último elemento como pivô
+    int i = esq;             // Limite para os elementos menores que o pivô
+
+    // Percorre até o penúltimo elemento
+    for (int j = esq; j < dir - 1; ++j) {
+        if (arr[j] <= pivo) {
+            std::swap(arr[i], arr[j]);
+            ++i;
+        }
+    }
+    // Posiciona o pivô no ponto de corte correto
+    std::swap(arr[i], arr[dir - 1]);
+    return i;
+}
+
+/**
+ * Ordena um subvetor utilizando o Quick Sort no intervalo [esq, dir).
+ * 
+ * @param arr Vetor de inteiros a ser ordenado.
+ * @param esq Índice inicial (inclusivo).
+ * @param dir Índice final (exclusivo).
+ */
+void quickSort(std::vector<int>& arr, int esq, int dir) {
+    // Caso base: 0 ou 1 elemento não requer ordenação
+    if (dir - esq <= 1) return;
+
+    // Obtém o índice do pivô devidamente particionado
+    int p = particiona(arr, esq, dir);
+
+    // Chamadas recursivas respeitando estritamente o intervalo [esq, dir)
+    quickSort(arr, esq, p);     // Metade esquerda: [esq, p)
+    quickSort(arr, p + 1, dir); // Metade direita: [p + 1, dir)
+}
+
+int main() {
+    const int TRIALS = 5;
+
+    // --------------------------------------------------------------------------
+    // 1. MELHOR/MÉDIO CASO (Vetor balanceado com elementos aleatórios) -> O(N log N)
+    // Permite testar até N = 500.000 devido à eficiência assintótica
+    // --------------------------------------------------------------------------
+    std::cout << "MELHORES CASOS - QUICK SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = 0; size <= 500000; size += 25000) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = (i * 37) % size; // Padrão balanceado
+
+            auto start = std::chrono::high_resolution_clock::now();
+            quickSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    std::cout << "\n";
+
+    // --------------------------------------------------------------------------
+    // 2. PIOR CASO (Vetor decrescente com pivô no fim gera partições O(N)) -> O(N^2)
+    // Limitado a N = 20.000 para evitar stack overflow e tempo excessivo
+    // --------------------------------------------------------------------------
+    std::cout << "PIORES CASOS - QUICK SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = 0; size <= 20000; size += 1000) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = size - i; // Degenera o particionamento
+
+            auto start = std::chrono::high_resolution_clock::now();
+            quickSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    return 0;
+}
