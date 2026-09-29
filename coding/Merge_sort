@@ -1,0 +1,131 @@
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <numeric>
+#include <algorithm>
+
+/**
+ * Intercala dois subvetores adjacentes previamente ordenados: [esq, meio) e [meio, dir).
+ * 
+ * @param arr Vetor original.
+ * @param esq Índice inicial do primeiro subvetor.
+ * @param meio Índice divisor (fim do primeiro subvetor e início do segundo).
+ * @param dir Índice final do segundo subvetor.
+ */
+void intercala(std::vector<int>& arr, int esq, int meio, int dir) {
+    // Aloca vetor auxiliar dinamicamente via vector (sem vazamento de memória)
+    std::vector<int> temp;
+    temp.reserve(dir - esq);
+
+    int i = esq;   // Início do subvetor esquerdo
+    int j = meio;  // Início do subvetor direito
+
+    // Intercala escolhendo sempre o menor elemento disponível
+    while (i < meio && j < dir) {
+        if (arr[i] <= arr[j]) {
+            temp.push_back(arr[i++]);
+        } else {
+            temp.push_back(arr[j++]);
+        }
+    }
+
+    // Copia os elementos restantes da metade esquerda (se restarem)
+    while (i < meio) {
+        temp.push_back(arr[i++]);
+    }
+
+    // Copia os elementos restantes da metade direita (se restarem)
+    while (j < dir) {
+        temp.push_back(arr[j++]);
+    }
+
+    // Transfere os dados ordenados de volta ao intervalo [esq, dir) do vetor original
+    for (size_t k = 0; k < temp.size(); ++k) {
+        arr[esq + k] = temp[k];
+    }
+}
+
+/**
+ * Ordena um subvetor utilizando o algoritmo Merge Sort no intervalo [esq, dir).
+ * 
+ * @param arr Vetor de inteiros a ser ordenado.
+ * @param esq Índice inicial (inclusivo).
+ * @param dir Índice final (exclusivo).
+ */
+void mergeSort(std::vector<int>& arr, int esq, int dir) {
+    // Caso base: subvetores com 0 ou 1 elemento já estão ordenados
+    if (dir - esq <= 1) return;
+
+    // Calcula o ponto médio prevenindo overflow aritmético
+    int meio = esq + (dir - esq) / 2;
+
+    // Divisão: ordena recursivamente ambas as metades em [esq, dir)
+    mergeSort(arr, esq, meio);
+    mergeSort(arr, meio, dir);
+
+    // Conquista: intercala as duas metades ordenadas
+    intercala(arr, esq, meio, dir);
+}
+
+int main() {
+    const int TRIALS = 5;
+    const int START_SIZE = 0;
+    const int END_SIZE = 500000; // Merge Sort opera em O(N log N) em todos os casos
+    const int STEP = 25000;
+
+    // --------------------------------------------------------------------------
+    // 1. MELHOR CASO (Vetor em ordem crescente) -> O(N log N)
+    // --------------------------------------------------------------------------
+    std::cout << "MELHORES CASOS - MERGE SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = i;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            mergeSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    std::cout << "\n";
+
+    // --------------------------------------------------------------------------
+    // 2. PIOR CASO (Vetor em ordem decrescente) -> O(N log N)
+    // --------------------------------------------------------------------------
+    std::cout << "PIORES CASOS - MERGE SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = size - i;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            mergeSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    return 0;
+}
