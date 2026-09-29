@@ -1,0 +1,97 @@
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <numeric>
+#include <algorithm>
+
+/**
+ * Ordena um subvetor utilizando o algoritmo Selection Sort.
+ * 
+ * @param arr Vetor de inteiros a ser ordenado.
+ * @param esq Índice inicial do intervalo (inclusivo).
+ * @param dir Índice final do intervalo (exclusivo).
+ */
+void selectionSort(std::vector<int>& arr, int esq, int dir) {
+    // Caso base: subvetores com 0 ou 1 elemento já estão ordenados
+    if (dir - esq <= 1) return;
+
+    // Percorre até o penúltimo elemento válido
+    for (int i = esq; i < dir - 1; ++i) {
+        int menor_idx = i; // Assume inicialmente que o menor elemento está na posição i
+
+        // Procura pelo menor elemento no restante do subvetor
+        for (int j = i + 1; j < dir; ++j) {
+            if (arr[j] < arr[menor_idx]) {
+                menor_idx = j; // Atualiza o índice do menor elemento
+            }
+        }
+
+        // Se encontrou um elemento menor, realiza a troca
+        if (menor_idx != i) {
+            std::swap(arr[i], arr[menor_idx]);
+        }
+    }
+}
+
+int main() {
+    const int TRIALS = 5;
+    const int START_SIZE = 0;
+    const int END_SIZE = 20000;
+    const int STEP = 1000;
+
+    // --------------------------------------------------------------------------
+    // 1. MELHOR CASO (Vetor em ordem crescente) -> O(N^2) de comparações
+    // --------------------------------------------------------------------------
+    std::cout << "MELHORES CASOS - SELECTION SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = i;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            selectionSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    std::cout << "\n";
+
+    // --------------------------------------------------------------------------
+    // 2. PIOR CASO (Vetor em ordem decrescente) -> O(N^2)
+    // --------------------------------------------------------------------------
+    std::cout << "PIORES CASOS - SELECTION SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = size - i;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            selectionSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    return 0;
+}
