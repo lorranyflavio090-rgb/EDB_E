@@ -1,9 +1,3 @@
-/**
- * @file ex1_insertion.cpp
- * @brief Implementação e medição do Insertion Sort no intervalo [esq, dir).
- * Disciplina: DIM0119 - Estruturas de Dados Básicas 1
- */
-
 #include <iostream>
 #include <vector>
 #include <chrono
