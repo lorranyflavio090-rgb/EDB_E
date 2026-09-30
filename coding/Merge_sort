@@ -4,14 +4,7 @@
 #include <numeric>
 #include <algorithm>
 
-/**
- * Intercala dois subvetores adjacentes previamente ordenados: [esq, meio) e [meio, dir).
- * 
- * @param arr Vetor original.
- * @param esq Índice inicial do primeiro subvetor.
- * @param meio Índice divisor (fim do primeiro subvetor e início do segundo).
- * @param dir Índice final do segundo subvetor.
- */
+
 void intercala(std::vector<int>& arr, int esq, int meio, int dir) {
     // Aloca vetor auxiliar dinamicamente via vector (sem vazamento de memória)
     std::vector<int> temp;
