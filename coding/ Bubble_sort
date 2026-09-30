@@ -4,13 +4,7 @@
 #include <numeric>
 #include <algorithm>
 
-/**
- * Ordena um subvetor utilizando o algoritmo Bubble Sort otimizado.
- * 
- * @param arr Vetor de inteiros a ser ordenado.
- * @param esq Índice inicial do intervalo (inclusivo).
- * @param dir Índice final do intervalo (exclusivo).
- */
+
 void bubbleSort(std::vector<int>& arr, int esq, int dir) {
     if (dir - esq <= 1) return;
 
