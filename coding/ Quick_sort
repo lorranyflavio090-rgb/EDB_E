@@ -4,14 +4,7 @@
 #include <numeric>
 #include <algorithm>
 
-/**
- * Particiona o subvetor em torno de um pivô (último elemento: arr[dir - 1]).
- * 
- * @param arr Vetor original.
- * @param esq Início do subvetor (inclusivo).
- * @param dir Fim do subvetor (exclusivo).
- * @return Índice final de posicionamento do pivô.
- */
+
 int particiona(std::vector<int>& arr, int esq, int dir) {
     int pivo = arr[dir - 1]; // Escolhe o último elemento como pivô
     int i = esq;             // Limite para os elementos menores que o pivô
