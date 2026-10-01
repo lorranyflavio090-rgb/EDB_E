@@ -1,0 +1,62 @@
+int main() {
+    const int TRIALS = 5;
+    const int START_SIZE = 0;
+    const int END_SIZE = 20000; // Limite viável para O(N^2)
+    const int STEP = 1000;
+
+    // --------------------------------------------------------------------------
+    // 1. MELHOR CASO (Vetor já ordenado em ordem crescente) -> O(N)
+    // --------------------------------------------------------------------------
+    std::cout << "MELHORES CASOS - INSERTION SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = i; // Vetor crescente
+
+            auto start = std::chrono::high_resolution_clock::now();
+            insertionSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    std::cout << "\n";
+
+    // --------------------------------------------------------------------------
+    // 2. PIOR CASO (Vetor em ordem estritamente decrescente) -> O(N^2)
+    // --------------------------------------------------------------------------
+    std::cout << "PIORES CASOS - INSERTION SORT\n";
+    std::cout << "Tamanho,Tempo_ns\n";
+
+    for (int size = START_SIZE; size <= END_SIZE; size += STEP) {
+        if (size == 0) {
+            std::cout << "0,0\n";
+            continue;
+        }
+
+        long long totalDuration = 0;
+        for (int t = 0; t < TRIALS; ++t) {
+            std::vector<int> vec(size);
+            for (int i = 0; i < size; ++i) vec[i] = size - i; // Vetor decrescente
+
+            auto start = std::chrono::high_resolution_clock::now();
+            insertionSort(vec, 0, size);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            totalDuration += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        std::cout << size << "," << (totalDuration / TRIALS) << "\n";
+    }
+
+    return 0;
+}
