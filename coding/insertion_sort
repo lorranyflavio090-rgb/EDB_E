@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <chrono
+#include <chrono>
 #include <numeric>
 #include <algorithm>
 
